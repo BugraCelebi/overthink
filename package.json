@@ -1,9 +1,6 @@
 {
   "name": "overthink",
   "version": "1.0.0",
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "node server/index.js",
