@@ -18,7 +18,7 @@ export default function Header({ activeCount, theme, onToggleTheme }) {
             letterSpacing: '-0.5px',
           }}
         >
-          Overthink
+          overthink
         </h1>
         <span style={{ fontSize: 'var(--font-size-2xl)', color: 'var(--color-primary)', fontWeight: 'var(--font-weight-semibold)' }}>.</span>
       </div>
