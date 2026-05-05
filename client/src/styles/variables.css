@@ -1,0 +1,103 @@
+:root {
+  /* Color palette — Light */
+  --color-bg: #FAF7F2;
+  --color-surface: #FFFFFF;
+  --color-border: #E8E0D5;
+  --color-border-hover: #D4C9BC;
+
+  --color-primary: #D97706;
+  --color-primary-light: #F59E0B;
+  --color-primary-subtle: #FEF3C7;
+
+  --color-text-primary: #1C1917;
+  --color-text-secondary: #78716C;
+  --color-text-muted: #A8A29E;
+  --color-text-disabled: #C4BDB8;
+
+  --color-low: #A8A29E;
+  --color-normal: #D97706;
+  --color-high: #DC2626;
+
+  --color-completed-bg: #F9F6F2;
+  --color-completed-text: #A8A29E;
+
+  /* Status colors */
+  --color-status-doing:    #D97706;
+  --color-status-brewing:  #7C3AED;
+  --color-status-on_hold:  #6B7280;
+  --color-status-done:     #059669;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-lg: 17px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 26px;
+  --font-size-3xl: 32px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.7;
+
+  /* Borders & Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 100ms ease;
+  --transition-base: 150ms ease;
+  --transition-slow: 250ms ease;
+
+  /* Layout */
+  --content-width: 1280px;
+  --header-height: 64px;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --color-bg: #1A1714;
+  --color-surface: #232019;
+  --color-border: #38322A;
+  --color-border-hover: #4A4238;
+
+  --color-primary: #F59E0B;
+  --color-primary-light: #FCD34D;
+  --color-primary-subtle: #2C2008;
+
+  --color-text-primary: #F0E8DC;
+  --color-text-secondary: #B8A898;
+  --color-text-muted: #7A6E65;
+  --color-text-disabled: #4A4440;
+
+  --color-low: #6B6560;
+  --color-normal: #F59E0B;
+  --color-high: #EF4444;
+
+  --color-completed-bg: #1E1B17;
+  --color-completed-text: #5A5450;
+
+  --color-status-doing:    #F59E0B;
+  --color-status-brewing:  #A78BFA;
+  --color-status-on_hold:  #9CA3AF;
+  --color-status-done:     #34D399;
+}
