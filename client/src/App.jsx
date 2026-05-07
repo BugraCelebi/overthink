@@ -3,13 +3,16 @@ import Header from './components/Header';
 import AddTask from './components/AddTask';
 import KanbanBoard from './components/KanbanBoard';
 import CalendarView from './components/CalendarView';
+import LoginPage from './components/LoginPage';
+import { apiFetch } from './api';
 
 export default function App() {
-  const [tasks, setTasks]     = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
-  const [theme, setTheme]     = useState(() => localStorage.getItem('theme') || 'light');
-  const [view, setView]       = useState('board'); // 'board' | 'calendar'
+  const [tasks, setTasks]       = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(null);
+  const [theme, setTheme]       = useState(() => localStorage.getItem('theme') || 'light');
+  const [view, setView]         = useState('board');
+  const [username, setUsername] = useState(() => localStorage.getItem('username'));
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -20,7 +23,7 @@ export default function App() {
 
   const fetchTasks = useCallback(async () => {
     try {
-      const res = await fetch('/api/tasks');
+      const res = await apiFetch('/api/tasks');
       if (!res.ok) throw new Error('Failed to fetch tasks');
       setTasks(await res.json());
     } catch (err) {
@@ -30,14 +33,22 @@ export default function App() {
     }
   }, []);
 
-  useEffect(() => { fetchTasks(); }, [fetchTasks]);
+  useEffect(() => {
+    if (username) fetchTasks();
+  }, [username, fetchTasks]);
+
+  function handleLogout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    setUsername(null);
+    setTasks([]);
+  }
 
   const addTask = useCallback(async (title) => {
     if (!title.trim()) return;
     try {
-      const res = await fetch('/api/tasks', {
+      const res = await apiFetch('/api/tasks', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: title.trim() }),
       });
       if (!res.ok) throw new Error('Failed to create task');
@@ -49,12 +60,10 @@ export default function App() {
   }, []);
 
   const updateTask = useCallback(async (id, changes) => {
-    // Optimistic update
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...changes } : t)));
     try {
-      const res = await fetch(`/api/tasks/${id}`, {
+      const res = await apiFetch(`/api/tasks/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(changes),
       });
       if (!res.ok) throw new Error('Failed to update task');
@@ -69,7 +78,7 @@ export default function App() {
   const deleteTask = useCallback(async (id) => {
     setTasks((prev) => prev.filter((t) => t.id !== id));
     try {
-      const res = await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+      const res = await apiFetch(`/api/tasks/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete task');
     } catch (err) {
       setError(err.message);
@@ -77,20 +86,23 @@ export default function App() {
     }
   }, [fetchTasks]);
 
+  if (!username) {
+    return <LoginPage onAuth={setUsername} />;
+  }
+
   const activeCount = tasks.filter((t) => t.status !== 'done').length;
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-bg)' }}>
-      <div
-        style={{
-          maxWidth: 'var(--content-width)',
-          margin: '0 auto',
-          padding: '0 var(--space-6)',
-        }}
-      >
-        {/* Header + AddTask above the divider */}
+      <div style={{ maxWidth: 'var(--content-width)', margin: '0 auto', padding: '0 var(--space-6)' }}>
         <div style={{ borderBottom: '1px solid var(--color-border)', marginBottom: 'var(--space-6)' }}>
-          <Header activeCount={activeCount} theme={theme} onToggleTheme={toggleTheme} />
+          <Header
+            activeCount={activeCount}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+            username={username}
+            onLogout={handleLogout}
+          />
           <div style={{ maxWidth: 560, paddingBottom: 'var(--space-5)' }}>
             <AddTask onAdd={addTask} />
           </div>
@@ -98,18 +110,16 @@ export default function App() {
 
         <main style={{ paddingBottom: 'var(--space-16)', paddingTop: 'var(--space-4)' }}>
           {error && (
-            <div
-              style={{
-                marginBottom: 'var(--space-4)',
-                padding: 'var(--space-3) var(--space-4)',
-                border: '1px solid #FCA5A5',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: theme === 'dark' ? '#2D1515' : '#FEF2F2',
-                color: theme === 'dark' ? '#FCA5A5' : '#B91C1C',
-                fontSize: 'var(--font-size-sm)',
-                maxWidth: 560,
-              }}
-            >
+            <div style={{
+              marginBottom: 'var(--space-4)',
+              padding: 'var(--space-3) var(--space-4)',
+              border: '1px solid #FCA5A5',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: theme === 'dark' ? '#2D1515' : '#FEF2F2',
+              color: theme === 'dark' ? '#FCA5A5' : '#B91C1C',
+              fontSize: 'var(--font-size-sm)',
+              maxWidth: 560,
+            }}>
               {error}
               <button
                 onClick={() => setError(null)}
@@ -120,12 +130,8 @@ export default function App() {
             </div>
           )}
 
-          {/* View toggle */}
           <div style={{ display: 'flex', gap: 4, marginBottom: 'var(--space-5)' }}>
-            {[
-              { key: 'board',    label: 'Board' },
-              { key: 'calendar', label: 'Calendar' },
-            ].map(({ key, label }) => {
+            {[{ key: 'board', label: 'Board' }, { key: 'calendar', label: 'Calendar' }].map(({ key, label }) => {
               const active = view === key;
               return (
                 <button
@@ -150,14 +156,7 @@ export default function App() {
           </div>
 
           {loading ? (
-            <div
-              style={{
-                marginTop: 'var(--space-12)',
-                textAlign: 'center',
-                color: 'var(--color-text-muted)',
-                fontSize: 'var(--font-size-sm)',
-              }}
-            >
+            <div style={{ marginTop: 'var(--space-12)', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: 'var(--font-size-sm)' }}>
               Loading...
             </div>
           ) : view === 'calendar' ? (

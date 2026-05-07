@@ -3,6 +3,8 @@ const cors    = require('cors');
 const path    = require('path');
 const db      = require('./db');
 const tasksRouter = require('./routes/tasks');
+const authRouter  = require('./routes/auth');
+const { authenticateToken } = require('./middleware/auth');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -11,22 +13,21 @@ const isProd = process.env.NODE_ENV === 'production';
 app.use(cors());
 app.use(express.json());
 
-// API routes
-app.use('/api/tasks', tasksRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/tasks', authenticateToken, tasksRouter);
 
-app.get('/api/progress', (_req, res) => {
+app.get('/api/progress', authenticateToken, (req, res) => {
   try {
-    res.json(db.prepare('SELECT * FROM user_progress WHERE id = 1').get());
+    db.prepare('INSERT OR IGNORE INTO user_progress (user_id) VALUES (?)').run(req.user.id);
+    res.json(db.prepare('SELECT * FROM user_progress WHERE user_id = ?').get(req.user.id));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Production: serve the built React app
 if (isProd) {
   const clientDist = path.join(__dirname, '../client/dist');
   app.use(express.static(clientDist));
-  // SPA fallback — all non-API routes go to index.html
   app.get('*', (_req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'));
   });

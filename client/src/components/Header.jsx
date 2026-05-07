@@ -1,4 +1,4 @@
-export default function Header({ activeCount, theme, onToggleTheme }) {
+export default function Header({ activeCount, theme, onToggleTheme, username, onLogout }) {
   return (
     <header
       style={{
@@ -36,6 +36,32 @@ export default function Header({ activeCount, theme, onToggleTheme }) {
             ? '1 remaining'
             : `${activeCount} remaining`}
         </span>
+
+        {username && (
+          <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>
+            {username}
+          </span>
+        )}
+
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            title="Sign out"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-muted)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px 8px',
+              borderRadius: 'var(--radius-md)',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-text-primary)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-muted)'; }}
+          >
+            Sign out
+          </button>
+        )}
 
         {/* Theme toggle */}
         <button
